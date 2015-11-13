@@ -1,0 +1,5 @@
+*.hi
+*.o
+*_flymake.hs
+
+.DS_Store
