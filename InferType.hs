@@ -5,6 +5,7 @@ import qualified Text.ParserCombinators.Parsec.Token as P
 
 data Expr = Natural Integer
           | BinOp String Expr Expr
+          | Var String
   deriving (Show)
 
 lexer :: P.TokenParser ()
@@ -13,6 +14,7 @@ lexer = P.makeTokenParser (haskellDef { reservedOpNames = ["*", "/", "+", "-"] }
 natural     = P.natural lexer
 parens      = P.parens lexer
 reservedOp  = P.reservedOp lexer
+identifier  = P.identifier lexer
 
 expr :: Parser Expr
 expr = buildExpressionParser table term <?> "expression"
@@ -30,6 +32,9 @@ term =
   } <|> do {
     n <- natural;
     return $ Natural n
+  } <|> do {
+    var <- identifier;
+    return $ Var var
   } <?>
     "term"
 
@@ -40,5 +45,4 @@ stmt = do
   return e
 
 main = do
-  print $ parse stmt "" "-1 + 2 * 3"
-  print $ parse stmt "" "(-1 + 2) * 3"
+  print $ parse stmt "" "-x + y"
