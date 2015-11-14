@@ -1,13 +1,11 @@
+module Parser (parseString) where
+
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as P
 
-data Expr = Natural Integer
-          | Var String
-          | Fun String Expr
-          | App Expr Expr
-  deriving (Show)
+import Node (Expr(..))
 
 lexer :: P.TokenParser ()
 lexer = P.makeTokenParser (haskellDef { reservedOpNames = ["*", "/", "+", "-"] })
@@ -63,7 +61,4 @@ stmt = do
   eof
   return e
 
-main = do
-  print $ parse stmt "" "(\\x -> x * x) 111"
-  print $ parse stmt "" "(\\square -> square 111) (\\x -> x * x)"
-  print $ parse stmt "" "\\f -> \\x -> f x + 1"
+parseString text = parse stmt "" text
