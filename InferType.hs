@@ -7,6 +7,7 @@ data Expr = Natural Integer
           | BinOp String Expr Expr
           | Var String
           | Fun String Expr
+          | App Expr Expr
   deriving (Show)
 
 lexer :: P.TokenParser ()
@@ -28,7 +29,10 @@ expr = buildExpressionParser table term <|> fun <?> "expression"
     unary s op = Prefix (do{ reservedOp s; return op })
 
 term :: Parser Expr
-term =
+term = try(app) <|> try(factor)
+
+factor :: Parser Expr
+factor =
   do {
     parens expr;
   } <|> do {
@@ -38,7 +42,7 @@ term =
     var <- identifier;
     return $ Var var
   } <?>
-    "term"
+    "factor"
 
 fun :: Parser Expr
 fun = do
@@ -48,6 +52,12 @@ fun = do
   e <- expr
   return $ Fun param e
 
+app :: Parser Expr
+app = do
+  f <- factor
+  arg <- factor
+  return $ App f arg
+
 stmt :: Parser Expr
 stmt = do
   e <- expr
@@ -55,4 +65,6 @@ stmt = do
   return e
 
 main = do
-  print $ parse stmt "" "\\x -> x * x"
+  print $ parse stmt "" "(\\x -> x * x) 111"
+  print $ parse stmt "" "(\\square -> square 111) (\\x -> x * x)"
+  print $ parse stmt "" "\\f -> \\x -> f x + 1"
