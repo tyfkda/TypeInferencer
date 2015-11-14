@@ -4,7 +4,6 @@ import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as P
 
 data Expr = Natural Integer
-          | BinOp String Expr Expr
           | Var String
           | Fun String Expr
           | App Expr Expr
@@ -22,11 +21,11 @@ lexeme      = P.lexeme lexer
 expr :: Parser Expr
 expr = buildExpressionParser table term <|> fun <?> "expression"
   where
-    table = [[unary "-" (BinOp "-" (Natural 0))],
+    table = [[unary "-" "negate"],
              [binop "*" AssocLeft, binop "/" AssocLeft],
              [binop "+" AssocLeft, binop "-" AssocLeft]]
-    binop op assoc = Infix (do{ reservedOp op; return (BinOp op) } <?> "operator") assoc
-    unary s op = Prefix (do{ reservedOp s; return op })
+    binop op assoc = Infix (do{ reservedOp op; return $ \x y -> App (App (Var op) x) y } <?> "operator") assoc
+    unary s op = Prefix (do{ reservedOp s; return $ App (Var op) })
 
 term :: Parser Expr
 term = try(app) <|> try(factor)
