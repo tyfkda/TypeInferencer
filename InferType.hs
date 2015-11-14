@@ -6,6 +6,7 @@ import qualified Text.ParserCombinators.Parsec.Token as P
 data Expr = Natural Integer
           | BinOp String Expr Expr
           | Var String
+          | Fun String Expr
   deriving (Show)
 
 lexer :: P.TokenParser ()
@@ -15,9 +16,10 @@ natural     = P.natural lexer
 parens      = P.parens lexer
 reservedOp  = P.reservedOp lexer
 identifier  = P.identifier lexer
+lexeme      = P.lexeme lexer
 
 expr :: Parser Expr
-expr = buildExpressionParser table term <?> "expression"
+expr = buildExpressionParser table term <|> fun <?> "expression"
   where
     table = [[unary "-" (BinOp "-" (Natural 0))],
              [binop "*" AssocLeft, binop "/" AssocLeft],
@@ -38,6 +40,14 @@ term =
   } <?>
     "term"
 
+fun :: Parser Expr
+fun = do
+  lexeme $ char '\\'
+  param <- identifier
+  lexeme $ string "->"
+  e <- expr
+  return $ Fun param e
+
 stmt :: Parser Expr
 stmt = do
   e <- expr
@@ -45,4 +55,4 @@ stmt = do
   return e
 
 main = do
-  print $ parse stmt "" "-x + y"
+  print $ parse stmt "" "\\x -> x * x"
