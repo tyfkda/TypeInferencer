@@ -18,3 +18,4 @@ parseInfer code = do
 
 main = do
   parseInfer "\\f -> \\x -> f x + 1"
+  parseInfer "\\x -> x x"

@@ -54,10 +54,28 @@ unify t1 t2 varInfoRef
 
 unifyVar :: Int -> Type -> STRef s VarInfo -> ST s ()
 unifyVar index type2 varInfoRef = do
-  (nextIdx, varMap) <- readSTRef varInfoRef
-  case lookup index varMap of
-    Just vt  -> unify vt type2 varInfoRef
-    Nothing  -> writeSTRef varInfoRef (nextIdx, insert index type2 varMap)
+  isOccur <- occur type2 index varInfoRef
+  if isOccur
+    then  error "occurs error"
+    else do
+      (nextIdx, varMap) <- readSTRef varInfoRef
+      case lookup index varMap of
+        Just vt  -> unify vt type2 varInfoRef
+        Nothing  -> writeSTRef varInfoRef (nextIdx, insert index type2 varMap)
+
+occur :: Type -> Int -> STRef s VarInfo -> ST s Bool
+occur (TFun p e) n varInfoRef = do
+  b1 <- occur p n varInfoRef
+  b2 <- occur e n varInfoRef
+  return $ b1 || b2
+occur (TVar i) n varInfoRef
+  | i == n    = return True
+  | otherwise = do
+      (_, varMap) <- readSTRef varInfoRef
+      case lookup i varMap of
+        Just vt  -> occur vt n varInfoRef
+        Nothing  -> return False
+occur _ _ _   = return False
 
 createVar :: STRef s VarInfo -> ST s Type
 createVar varInfoRef = do
