@@ -29,36 +29,15 @@ term :: Parser Expr
 term = try(app) <|> try(factor)
 
 factor :: Parser Expr
-factor =
-  do {
-    parens expr;
-  } <|> do {
-    n <- natural;
-    return $ Natural n
-  } <|> do {
-    var <- identifier;
-    return $ Var var
-  } <?>
-    "factor"
+factor = parens expr <|> (Natural <$> natural) <|> (Var <$> identifier) <?> "factor"
 
 fun :: Parser Expr
-fun = do
-  lexeme $ char '\\'
-  param <- identifier
-  lexeme $ string "->"
-  e <- expr
-  return $ Fun param e
+fun = Fun <$> (lexeme (char '\\') *> identifier) <*> (lexeme (string "->") *> expr)
 
 app :: Parser Expr
-app = do
-  f <- factor
-  arg <- factor
-  return $ App f arg
+app = App <$> factor <*> factor
 
 stmt :: Parser Expr
-stmt = do
-  e <- expr
-  eof
-  return e
+stmt = expr <* eof
 
 parseString text = parse stmt "" text
