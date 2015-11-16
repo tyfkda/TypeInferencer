@@ -18,8 +18,8 @@ infer :: [(String, Type)] -> Expr -> Type
 infer env expr = runST $ do
   varInfoRef <- newSTRef (0, empty)
   t <- doInfer (fromList env) varInfoRef expr
-  (_, varDict) <- readSTRef varInfoRef
-  return $ refer t varDict
+  (_, varMap) <- readSTRef varInfoRef
+  return $ refer t varMap
 
 doInfer :: Env -> STRef s VarInfo -> Expr -> ST s Type
 doInfer env varInfoRef expr =
