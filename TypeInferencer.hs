@@ -64,10 +64,7 @@ unifyVar index type2 varInfoRef = do
         Nothing  -> writeSTRef varInfoRef (nextIdx, insert index type2 varMap)
 
 occur :: Type -> Int -> STRef s VarInfo -> ST s Bool
-occur (TFun p e) n varInfoRef = do
-  b1 <- occur p n varInfoRef
-  b2 <- occur e n varInfoRef
-  return $ b1 || b2
+occur (TFun p e) n varInfoRef = (||) <$> occur p n varInfoRef <*> occur e n varInfoRef
 occur (TVar i) n varInfoRef
   | i == n    = return True
   | otherwise = do
