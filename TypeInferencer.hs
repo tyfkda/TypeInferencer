@@ -85,7 +85,7 @@ refer (TFun p e) varMap = TFun (refer p varMap) (refer e varMap)
 refer t@(TVar v) varMap = case lookup v varMap of
   Just vt  -> refer vt varMap
   Nothing  -> t
-refer t varMap          = t
+refer t _               = t
 
 cannotUnify t1 t2 varInfoRef = do
   (_, varMap) <- readSTRef varInfoRef
