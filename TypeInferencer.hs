@@ -24,7 +24,7 @@ infer env expr = runST $ do
 doInfer :: Env -> STRef s VarInfo -> Expr -> ST s Type
 doInfer env varInfoRef expr =
   case expr of
-    Natural i  -> return TInt
+    Natural _  -> return TInt
     Var x -> do
       case lookup x env of
         Just t  -> return t
@@ -44,7 +44,7 @@ unify :: Type -> Type -> STRef s VarInfo -> ST s ()
 unify (TFun p1 e1) (TFun p2 e2) varInfoRef = do
   unify p1 p2 varInfoRef
   unify e1 e2 varInfoRef
-unify t1@(TVar i1) t2@(TVar i2) varInfoRef
+unify (TVar i1) (TVar i2) _
   | i1 == i2  = return ()
 unify (TVar i1) t2 varInfoRef = unifyVar i1 t2 varInfoRef
 unify t1 (TVar i2) varInfoRef = unifyVar i2 t1 varInfoRef
@@ -87,6 +87,7 @@ refer t@(TVar v) varMap = case lookup v varMap of
   Nothing  -> t
 refer t _               = t
 
+cannotUnify :: Type -> Type -> STRef s (t, Map Int Type) -> ST s b
 cannotUnify t1 t2 varInfoRef = do
   (_, varMap) <- readSTRef varInfoRef
   error ("cannot unify: " ++ show (refer t1 varMap) ++ " <=> " ++ show (refer t2 varMap))

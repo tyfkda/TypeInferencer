@@ -10,12 +10,14 @@ globalEnv = [
   ("/", TFun TInt (TFun TInt TInt)),
   ("negate", TFun TInt TInt)]
 
+parseInfer :: String -> IO ()
 parseInfer code = do
   let result = parseString code
   case result of
     Right expr -> putStrLn (show expr ++ " :: " ++ show (infer globalEnv expr))
     Left err   -> print err
 
+main :: IO ()
 main = do
-  parseInfer "\\f -> \\x -> f x + 1"
-  parseInfer "\\x -> x x"
+  parseInfer "\\x -> x + 1"
+  parseInfer "\\f -> \\g -> \\x -> f (g x)"

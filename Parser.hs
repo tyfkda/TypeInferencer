@@ -40,4 +40,5 @@ app = App <$> factor <*> factor
 stmt :: Parser Expr
 stmt = expr <* eof
 
+parseString :: String -> Either ParseError Expr
 parseString text = parse stmt "" text
