@@ -2,4 +2,8 @@
 *.o
 *_flymake.hs
 
+.cabal-sandbox/
+cabal.sandbox.config
+/dist
+
 .DS_Store
