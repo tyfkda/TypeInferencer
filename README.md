@@ -20,5 +20,5 @@ Fun "f" (Fun "g" (Fun "x" (App (Var "f") (App (Var "g") (Var "x"))))) :: (t3 -> 
 
 ### Documentation (JP)
 
-* [Parsecで構文解析して構文木を作る - Qiita](http://qiita.com/tyfkda/items/0180d6c0a3f371f5c40a)
-* [compiler - 型推論を実装してみる - Qiita](http://qiita.com/tyfkda/items/25062cabd7df904bada3)
+* [Parsecで構文解析して構文木を作る - Kludge Factory](https://tyfkda.github.io/blog/2015/11/15/parsec-ast.html)
+* [型推論を実装してみる - Kludge Factory](https://tyfkda.github.io/blog/2015/11/15/type-inference.html)
