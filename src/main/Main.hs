@@ -1,3 +1,5 @@
+module Main where
+
 import Parser (parseString)
 import TypeInferencer (infer)
 import Type (Type(..))
